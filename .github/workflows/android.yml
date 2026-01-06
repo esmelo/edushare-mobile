@@ -40,5 +40,9 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: EduShare-App
-          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
+          name: EduShare-App-Package
+          # On utilise un chemin plus large pour être sûr de trouver l'APK
+          path: |
+            src-tauri/gen/android/**/*.apk
+            gen/android/**/*.apk
+          if-no-files-found: error # Cette fois, on veut une erreur si rien n'est trouvé pour savoir
