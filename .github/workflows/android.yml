@@ -30,10 +30,15 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Initialize and Build
+        # Ici on utilise la commande directe pour éviter l'erreur de target
         run: |
-          # On force l'initialisation mobile que tu n'as pas pu faire en local
           npx tauri android init --force
-          # On lance le build avec la syntaxe exacte de Tauri v2
           npx tauri android build --target aarch64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: edushare-apk
+          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
