@@ -37,7 +37,7 @@ jobs:
           # 2. Initialisation
           npx tauri android init
           
-          # 3. Build (Note le "true" après --apk)
+          # 3. Build (Le "true" est essentiel ici)
           npx tauri android build --target aarch64 --apk true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,5 +50,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: EduShare-App-Package
-          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
+          path: src-tauri/gen/android/**/*.apk
           if-no-files-found: error
