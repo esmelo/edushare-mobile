@@ -31,13 +31,14 @@ jobs:
 
       - name: Build Android APK
         run: |
-          # 1. Générer la keystore directement sur le serveur GitHub
+          # 1. Génération de la clé temporaire pour le build
           keytool -genkey -v -keystore edushare.keystore -alias edushare-alias -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ secrets.ANDROID_KEYSTORE_PASS }} -keypass ${{ secrets.ANDROID_KEYSTORE_PASS }} -dname "CN=KoutonVignon, OU=Dev, O=EduShare, L=Abidjan, S=Abidjan, C=CI"
-          # 2. Initialiser Android
+          
+          # 2. Initialisation Android
           npx tauri android init
           
-          # 3. Lancer le build avec la clé qu'on vient de créer
-          npx tauri android build --target aarch64
+          # 3. Build et Signature forcée
+          npx tauri android build --target aarch64 --apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_ANDROID_KEYSTORE_PATH: ../edushare.keystore
@@ -49,7 +50,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: EduShare-App-Package
-          path: |
-            src-tauri/gen/android/**/*.apk
-            gen/android/**/*.apk
-          if-no-files-found: error 
+          path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
