@@ -29,26 +29,27 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build Android APK
+      - name: Build and Force Sign APK
         run: |
-          # 1. Génération de la clé
+          # 1. Génération de la clé de signature
           keytool -genkey -v -keystore edushare.keystore -alias edushare-alias -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ secrets.ANDROID_KEYSTORE_PASS }} -keypass ${{ secrets.ANDROID_KEYSTORE_PASS }} -dname "CN=KoutonVignon, OU=Dev, O=EduShare, L=Abidjan, S=Abidjan, C=CI"
           
-          # 2. Initialisation
+          # 2. Compilation de l'application via Tauri
           npx tauri android init
-          
-          # 3. Build (Le "true" est essentiel ici)
           npx tauri android build --target aarch64 --apk true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_ANDROID_KEYSTORE_PATH: ../edushare.keystore
-          TAURI_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASS }}
-          TAURI_ANDROID_KEY_ALIAS: edushare-alias
-          TAURI_ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          
+          # 3. Signature manuelle (pour éviter le problème 'unsigned')
+          # On cherche l'APK généré par Tauri
+          APK_TEMP=$(find src-tauri/gen/android -name "*.apk" | head -n 1)
+          
+          # On le signe officiellement avec apksigner
+          $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks edushare.keystore --ks-key-alias edushare-alias --ks-pass pass:${{ secrets.ANDROID_KEYSTORE_PASS }} --key-pass pass:${{ secrets.ANDROID_KEYSTORE_PASS }} --out EduShare-final.apk "$APK_TEMP"
+          
+          echo "Succès : L'APK signée a été créée sous le nom EduShare-final.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: EduShare-App-Package
-          path: src-tauri/gen/android/**/*.apk
+          path: EduShare-final.apk
           if-no-files-found: error
