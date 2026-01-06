@@ -31,14 +31,14 @@ jobs:
 
       - name: Build Android APK
         run: |
-          # 1. Génération de la clé temporaire pour le build
+          # 1. Génération de la clé
           keytool -genkey -v -keystore edushare.keystore -alias edushare-alias -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ secrets.ANDROID_KEYSTORE_PASS }} -keypass ${{ secrets.ANDROID_KEYSTORE_PASS }} -dname "CN=KoutonVignon, OU=Dev, O=EduShare, L=Abidjan, S=Abidjan, C=CI"
           
-          # 2. Initialisation Android
+          # 2. Initialisation
           npx tauri android init
           
-          # 3. Build et Signature forcée
-          npx tauri android build --target aarch64 --apk
+          # 3. Build (Note le "true" après --apk)
+          npx tauri android build --target aarch64 --apk true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_ANDROID_KEYSTORE_PATH: ../edushare.keystore
