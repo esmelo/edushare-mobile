@@ -26,14 +26,18 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Initialize Android Platform
+        # Cette ligne simule ce que tu n'as pas pu faire sur ton PC
+        run: npx tauri android init --force
+
       - name: Build Android
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v0.1.0
-          releaseName: "EduShare v0.1.0"
-          releaseBody: "APK générée via GitHub Actions."
+          tagName: v0.1.1
+          releaseName: "EduShare v0.1.1"
+          releaseBody: "APK générée automatiquement."
           releaseDraft: true
           prerelease: false
           args: --target android
