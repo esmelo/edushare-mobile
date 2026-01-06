@@ -21,13 +21,19 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
+          # On force les cibles ici
           targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
 
       - name: Install Dependencies
         run: npm install
 
+      - name: Setup Android Targets
+        # On force Rust à reconnaître Android
+        run: |
+          rustup target add aarch64-linux-android
+          rustup target add armv7-linux-androideabi
+
       - name: Initialize Android Platform
-        # Cette ligne simule ce que tu n'as pas pu faire sur ton PC
         run: npx tauri android init --force
 
       - name: Build Android
@@ -35,9 +41,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v0.1.1
-          releaseName: "EduShare v0.1.1"
-          releaseBody: "APK générée automatiquement."
+          tagName: v0.1.2
+          releaseName: "EduShare v0.1.2"
+          releaseBody: "APK générée automatiquement après correction des targets."
           releaseDraft: true
           prerelease: false
-          args: --target android
+          args: --target aarch64-linux-android
