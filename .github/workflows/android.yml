@@ -21,7 +21,6 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          # On installe la cible précise pour éviter l'erreur "Target does not exist"
           targets: aarch64-linux-android
 
       - name: Install Dependencies
@@ -31,9 +30,10 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build Android APK
-        # On tape la commande MANUELLEMENT au lieu d'utiliser tauri-action
         run: |
-          npx tauri android init --force
+          # Initialisation simplifiée pour Tauri v2
+          npx tauri android init
+          # Build pour les téléphones modernes (64-bit)
           npx tauri android build --target aarch64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -41,6 +41,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: EduShare-Release-APK
-          # Chemin vers l'APK généré
+          name: EduShare-App-Android
           path: src-tauri/gen/android/app/build/outputs/apk/release/*.apk
