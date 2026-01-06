@@ -21,29 +21,19 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          # On force les cibles ici
-          targets: aarch64-linux-android, armv7-linux-androideabi, i686-linux-android, x86_64-linux-android
+          targets: aarch64-linux-android
 
       - name: Install Dependencies
         run: npm install
 
-      - name: Setup Android Targets
-        # On force Rust à reconnaître Android
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Initialize and Build
         run: |
-          rustup target add aarch64-linux-android
-          rustup target add armv7-linux-androideabi
-
-      - name: Initialize Android Platform
-        run: npx tauri android init --force
-
-      - name: Build Android
-        uses: tauri-apps/tauri-action@v0
+          # On force l'initialisation mobile que tu n'as pas pu faire en local
+          npx tauri android init --force
+          # On lance le build avec la syntaxe exacte de Tauri v2
+          npx tauri android build --target aarch64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: v0.1.2
-          releaseName: "EduShare v0.1.2"
-          releaseBody: "APK générée automatiquement après correction des targets."
-          releaseDraft: true
-          prerelease: false
-          args: --target aarch64-linux-android
